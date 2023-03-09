@@ -13,10 +13,11 @@
   <body>
 
 
+    
     <%- include('nav.html') %>
-    <div class="container">
-      <h1 id="now_year"></h1>
+    <div class="container" style="display: flex;">
       <button id="pre_btn" type="button"><</button>
+      <h1 id="now_year"></h1>
       <h2 id="now_month"></h2>
       <button id="next_btn">></button>
     </div>
@@ -50,14 +51,7 @@
       var month = now_date.getMonth(); //현재 월 (1월이 0부터 시작)
       var day = now_date.getDate(); //현재 일
 
-      //원하는 달 입력기능 추가하기
-
-      //근무자 띄우기
-
-
       var workers = ['경민', '성호', '종수', '성구'];
-
-
 
       function makeCal(year, month) {
         var first_day = new Date(year, month, 1).getDay(); //1일의 요일 구하기
@@ -79,7 +73,7 @@
               table_body += `<td></td>`;
             } else if (w == 0) {
               //첫째주이고 첫날이 시작하면
-              table_body += `<td><span style="font-size: 25px;">${today} </span><br>${workers[(day_count + today) % 4]} <br>${workers[(day_count + today-1) % 4]} </td>`;
+              table_body += `<td><span style="font-size: 25px;">${today} </span><br>${workers[(day_count + today) % 4]} <br>${workers[(day_count + today-1) % 4]} </td>`;              
               today++;
             } else if (w > 1 && today <= last_day) {
               //첫째줄 외의 경우에는
@@ -94,10 +88,11 @@
           table_body += `</tr>`;
         }
 
-        document.querySelector('#cal-body').innerHTML = table_body;
         document.querySelector('#now_year').innerHTML = `${year}년`;
         document.querySelector('#now_month').innerHTML = `${month + 1}월`;
+        document.querySelector('#cal-body').innerHTML = table_body;
       }
+
       makeCal(year, month);
 
       document.querySelector('#pre_btn').addEventListener('click', function () {
