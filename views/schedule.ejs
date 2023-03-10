@@ -34,7 +34,6 @@
       <table class="table table-bordered">
         <thead>
           <tr>
-            <input type="" name="" id="" />
             <th>일</th>
             <th>월</th>
             <th>화</th>
@@ -91,24 +90,11 @@
           for (let d = 0; d < 7; d++) {
             var day_work = `<td>
         <span style="font-size: 25px;">${today} </span><br>  
-        <form action="/vacation_req" method="post">
-  <input type="number" name="year" id="" value="${year}" style="display: none;">
-  <input type="number" name="month" id="" value="${month}" style="display: none;">
-  <input type="number" name="day" id="" value="${today}" style="display: none;">
-  <input type="text" name="worker" id="" value="${workers[(day_count + today) % 4]}" style="display: none;">
-  <input type="text" name="time" id="" value="day" style="display: none;">
-  <input type="text" name="changed_worker" id="" value="${workers[(day_count + today + 1) % 4]}" style="display: none;">
-  <button class="btn btn-secondary m-1" id="${year}${month}${today}-${workers[(day_count + today) % 4]}-day" type="submit">${workers[(day_count + today) % 4]}</button>
-</form>          
-        <form action="/vacation_req" method="post">
-  <input type="number" name="year" id="" value="${year}" style="display: none;">
-  <input type="number" name="month" id="" value="${month}" style="display: none;">
-  <input type="number" name="day" id="" value="${today}" style="display: none;">
-  <input type="text" name="worker" id="" value="${workers[(day_count + today - 1) % 4]}" style="display: none;">
-  <input type="text" name="time" id="" value="night" style="display: none;">
-  <input type="text" name="changed_worker" id="" value="${workers[(day_count + today - 2) % 4]}" style="display: none;">
-  <button class="btn btn-secondary m-1" id="${year}${month}${today}-${workers[(day_count + today - 1) % 4]}-night" type="submit">${workers[(day_count + today - 1) % 4]}</button>
-  </form>         
+       
+  <p  id="${year}${month}${today}-${workers[(day_count + today) % 4]}-day" type="submit">${workers[(day_count + today) % 4]}</p>
+
+  <p id="${year}${month}${today}-${workers[(day_count + today - 1) % 4]}-night" type="submit">${workers[(day_count + today - 1) % 4]}</p>
+       
     </td>`;
 
             if (w == 0 && d < first_day) {
@@ -131,7 +117,7 @@
           table_body += `</tr>`;
         }
 
-        $('#cal-body').append(table_body);
+        $('#cal-body').html(table_body);
         document.querySelector('#now_year').innerHTML = `${year}년`;
         document.querySelector('#now_month').innerHTML = `${month}월`;
         mark_vacation();
@@ -181,7 +167,7 @@
           for (let i = 0; i < data.length; i++) {
             var target = `${data[i].year}${data[i].month}${data[i].day}-${data[i].worker}-${data[i].time}`;
 
-            $(`#${target}`).html(data[i].changed).css('background-color', 'orange');
+            $(`#${target}`).html(`${data[i].worker}->${data[i].changed}`).css({'background-color': 'orange'});
             console.log(target);
           }
         }
