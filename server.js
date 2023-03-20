@@ -307,8 +307,7 @@ app.get('/change_pw', function (req, res) {
 });
 
 app.post('/change_pw', function (req, res) {
-  console.log(req.user);
-  console.log(req.body);
+  
 
   if (req.body.new_pw1 != req.body.new_pw2) {
     //패스워드가 다르면
@@ -326,17 +325,15 @@ app.post('/change_pw', function (req, res) {
 });
 
 function is_admin(req,res,next){
-if(req.user._authority=='admin'){
+if(req.user.authority=='admin'){
   next()
 }else{
-  res.send("<script>alert('관리자 권한입니다.');location.href='/login';</script>");
+  res.send("<script>alert('관리자 권한입니다.');location.href='/';</script>");
 }
 }
 
 app.get('/vacation_admin', is_admin,function (req, res) {
   db.collection('workers').findOne({ _id: req.user._id }, function (err, data) {
-    console.log(typeof req.user._id);
-    console.log(typeof data._id);
     if (String(req.user._id) == String(data._id)) {
       res.render('vacation-admin.ejs', { user: req.user });
     } else {
