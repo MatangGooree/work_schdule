@@ -54,6 +54,8 @@ const add_vac = schedule.scheduleJob('0 0 3 15 * *', function () {
   db.collection('workers').updateMany({}, { $inc: { vac_count: 1, ins_work: 1 } }, function (err, data) {});
 });
 
+
+
 app.get('/', function (req, res) {
   db.collection('workers')
     .find()
@@ -340,3 +342,4 @@ app.get('/vacation_admin', function (req, res) {
     }
   });
 });
+

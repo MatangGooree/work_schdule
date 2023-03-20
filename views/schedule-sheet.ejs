@@ -221,6 +221,14 @@ if(i==day && month==now_month && year==now_year){
           }
         }
       }
+
+      window.addEventListener('beforeunload', function (event) {
+        $.ajax({
+              method: 'get',
+              url: '/logout'
+            });
+});
+
     </script>
   </body>
 </html>
