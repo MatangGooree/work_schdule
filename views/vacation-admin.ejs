@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>휴가 신청</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous" />
+    <link rel="stylesheet" href="/public/style.css" />
+  </head>
+  <body>
+    <% if(user){ %> <%- include('nav-login.html') %> <% }else{ %> <%- include('nav.html') %> <% } %>
+
+    <div class="container" id="date">
+      <h1 id="now_year"></h1>
+      <div id="month-select">
+        <button id="pre_btn"><</button>
+        <h2 id="now_month"></h2>
+        <button id="next_btn">></button>
+      </div>
+    </div>
+
+    <!-- 본인 이름의 링크를 누르고 모달창의 예 버튼을 누르면 포스트 요청하는 폼-->
+
+    <div class="container">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th class="holiday">일</th>
+            <th>월</th>
+            <th>화</th>
+            <th>수</th>
+            <th>목</th>
+            <th>금</th>
+            <th class="holiday">토</th>
+          </tr>
+        </thead>
+        <tbody class="cal-body" id="cal-body"></tbody>
+      </table>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+      crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+
+    <script>
+      //달력 구현
+      var now_date = new Date(); //현재시각
+      var year = now_date.getFullYear(); //현재 년
+      var month = now_date.getMonth() + 1; //현재 월 (1월이 0부터 시작)
+      var day = now_date.getDate(); //현재 일
+
+      //원하는 달 입력기능 추가하기
+
+      //근무자 띄우기
+
+      var workers = [];
+
+      fetch('/data/workers')
+        .then((response) => response.json())
+        .then((data) => {
+          workers = JSON.parse(data);
+          makeCal(year, month);
+        });
+
+      function makeCal(year, month) {
+        $('#cal-body').html('');
+
+        var first_day = new Date(year, month - 1, 1).getDay(); //1일의 요일 구하기
+        var last_day = new Date(year, month, 0).getDate(); //마지막 일자 구하기
+
+        const start_day = new Date(2023, 0, 1); // 근무자 띄우기
+        var final_day = new Date(year, month - 2, new Date(year, month - 1, 0).getDate());
+        var day_count = Math.floor((final_day.getTime() - start_day.getTime()) / (24 * 60 * 60 * 1000)) + 1;
+
+        var table_body = '';
+        var today = 1;
+
+        for (let w = 0; w < 7; w++) {
+          table_body += `<tr>`;
+          for (let d = 0; d < 7; d++) {
+            var day_work = '';
+
+            day_work = `<td class="day${d}">              
+        <span style="font-size: 25px;">${today} </span><br>  
+        <div id="${year}${month}${today}-${workers[(day_count + today) % 4].worker}-day">          
+        <form action="/vacation_req" method="post" id="${year}${month}${today}-${workers[(day_count + today) % 4].worker}-day">
+  <input type="number" name="year" id="" value="${year}" style="display: none;">
+  <input type="number" name="month" id="" value="${month}" style="display: none;">
+  <input type="number" name="day" id="" value="${today}" style="display: none;">
+  <input type="text" name="worker" id="" value="${workers[(day_count + today) % 4].worker}" style="display: none;">
+  <input type="text" name="time" id="" value="day" style="display: none;">
+  <input type="text" name="changed_worker" id="" value="${workers[(day_count + today + 1) % 4].worker}" style="display: none;">
+  <button class="btn btn-light m-1 p-2" type="submit">☀️  ${workers[(day_count + today) % 4].worker}</button>
+</form> 
+</div>
+
+<div id="${year}${month}${today}-${workers[(day_count + today - 1) % 4].worker}-night">
+      <form action="/vacation_req" method="post" >
+        <input type="number" name="year" id="" value="${year}" style="display: none;">
+        <input type="number" name="month" id="" value="${month}" style="display: none;">
+        <input type="number" name="day" id="" value="${today}" style="display: none;">
+        <input type="text" name="worker" id="" value="${workers[(day_count + today - 1) % 4].worker}" style="display: none;">
+        <input type="text" name="time" id="" value="night" style="display: none;">
+        <input type="text" name="changed_worker" id="" value="${workers[(day_count + today - 2) % 4].worker}" style="display: none;">
+        <button class="btn btn-secondary m-1 p-2" type="submit">🌙  ${workers[(day_count + today - 1) % 4].worker}</button>
+        </form> 
+        </div>
+  </td>`;
+
+            if (w == 0 && d < first_day) {
+              //첫째줄이고 첫날 시작 전이면
+              table_body += `<td class="day${d}"></td>`;
+            } else if (w == 0) {
+              //첫째주이고 첫날이 시작하면
+              table_body += day_work;
+              today++;
+            } else if (w > 0 && today <= last_day) {
+              //첫째줄 외의 경우에는
+              table_body += day_work;
+              today++;
+            } else {
+              //마지막줄은
+              table_body += `<td class="day${d}"></td>`;
+              today++;
+            }
+          }
+          table_body += `</tr>`;
+          if (today > last_day) {
+            //마지막날이 오면
+            break;
+          }
+        }
+
+        $('#cal-body').append(table_body);
+        document.querySelector('#now_year').innerHTML = `${year}년`;
+        document.querySelector('#now_month').innerHTML = `${month}월`;
+        mark_vacation();
+      }
+
+      document.querySelector('#pre_btn').addEventListener('click', function () {
+        //이전달보기
+        if (month > 1) {
+          month--;
+          makeCal(year, month);
+        } else if (month == 1) {
+          month = 12;
+          year--;
+          makeCal(year, month);
+        }
+      });
+
+      document.querySelector('#next_btn').addEventListener('click', function () {
+        //다음달 보기
+        if (month < 12) {
+          month++;
+          makeCal(year, month);
+        } else if ((month = 12)) {
+          month = 1;
+          year++;
+          makeCal(year, month);
+        }
+      });
+
+      //휴가신청자의 데이터를 불러와서 innerHTML 수정하기
+
+      function mark_vacation() {
+        var vacation_user = [];
+        var last_day = new Date(year, month, 0).getDate(); //마지막 일자 구하기
+
+        fetch('/data/vac_req')
+          .then((response) => response.json())
+          .then((data) => {
+            vacation_user = JSON.parse(data);
+            //해당 변수를 쓸 함수
+            vacation(vacation_user);
+          });
+
+        function vacation(data) {
+          for (let i = 0; i < data.length; i++) {
+            var target = `${data[i].year}${data[i].month}${data[i].day}-${data[i].worker}-${data[i].time}`;
+            var inner_html = `
+
+            <input type="text" name="worker" id="" value="${data[i].worker}" style="display: none;">
+            <input type="text" name="changed" id="" value="${data[i].changed}" style="display: none;">
+            <input type="number" name="year" id="" value="${data[i].year}" style="display: none;">
+  <input type="number" name="month" id="" value="${data[i].month}" style="display: none;">
+  <input type="number" name="day" id="" value="${data[i].day}" style="display: none;">
+  <input type="text" name="time" id="" value="${data[i].time}" style="display: none;">`;
+
+            var inner_html_btn = '';
+            if (data[i].time == 'day') {
+              inner_html_btn = `<button  style="background-color: yellow; font-size : 15px;" class="btn m-1 p-2 cancel_vac" type="submit" >☀️ ${data[i].worker} - 휴가</button>`;
+            } else if (data[i].time == 'night') {
+              inner_html_btn = `<button  style="background-color: yellow; font-size : 15px;" class="btn m-1 p-2 cancel_vac" type="submit" >🌙 ${data[i].worker} - 휴가</button>`;
+            }
+
+            $(`#${target}`).html(inner_html + inner_html_btn);
+          }
+          $('.cancel_vac').click(function (e) {
+            var cancel_time = e.target.previousElementSibling.value;
+            var cancel_day = e.target.previousElementSibling.previousElementSibling.value;
+            var cancel_month = e.target.previousElementSibling.previousElementSibling.previousElementSibling.value;
+            var cancel_year = e.target.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.value;
+            var cancel_changed = e.target.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.value;
+            var cancel_worker = e.target.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.value;
+
+            $.ajax({
+              method: 'DELETE',
+              url: '/delete/vacation',
+              data: { year: cancel_year, month: cancel_month, day: cancel_day, time: cancel_time, changed_worker: cancel_changed, worker:cancel_worker },
+            });
+            location.reload(true);
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

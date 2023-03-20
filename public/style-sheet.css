@@ -1,0 +1,161 @@
+body {
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+#sheet-table tr :first-child {
+  width: 80px;
+  background-color: rgba(57, 47, 47, 0.294);
+  font-size: large;
+}
+
+#sheet-table td {
+  border: 1px solid black; /* 테두리 선 굵기, 스타일, 색상 */
+  padding: 5px 0;
+  line-height: 1.5;
+}
+
+#sheet-table th {
+  border: 1px solid black;
+  border-bottom: 3px solid black;
+  padding: 10px 0;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+#sheet-table thead {
+  background-color: rgba(24, 4, 4, 0.101);
+  text-align: center;
+}
+
+
+#today #day_num{
+    
+    font-size:x-large;
+    
+}
+
+#sheet-table .토,
+#sheet-table .일,
+td.holiday {
+  background-color: rgba(237, 202, 202, 0.511);
+}
+
+#form-change {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#change-table {
+  margin: 10px 0px;
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 10px; /* 버튼과 입력 필드 사이의 간격 조절 */
+}
+
+#date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+#month-select {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+#month-select button {
+    
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(130, 121, 109, 0.422);
+}
+
+#vac_table {
+    float: right;
+  text-align: center;
+  vertical-align: middle;
+}
+#vac_table td,
+#vac_table th {
+  border: 1px solid black;
+  border-bottom: 1px solid black;
+  width: 50px;
+}
+ 
+#vac_table thead , #vac_table th {
+  background-color: rgba(24, 4, 4, 0.101);
+  text-align: center;
+}
+#vac_table thead :first-child {
+  width: 80px;
+}
+@media (min-width: 1001px) {
+    /* 데스크탑 모드에서 적용될 스타일 */
+   
+#today  {
+    
+    transform: scale(1.15) translateY(-5px);
+   
+    color: white;
+    background-color:rgb(125, 125, 125) !important;
+    
+    border-radius: 10px;
+    
+}
+#sheet {
+    margin: 10px auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    
+    align-content: center;
+  }
+  
+  #sheet-table {
+    width: 100%;
+    height: 350px;
+    table-layout: fixed;
+    text-align: center;
+    vertical-align: middle;
+  }
+  }
+@media (max-width: 1000px) {
+    /* 모바일 모드에서 적용될 스타일 */
+
+#today{
+    
+    transform: scale(1.2) translateY(-3px) ;
+   
+    color: white;
+    background-color:rgb(125, 125, 125);
+    
+    border-radius: 10px;
+    
+}
+    #sheet {
+        border: 1px solid rgba(24, 4, 4, 0.814);
+        margin: 10px auto;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        width: 100%;
+        height: 352px;
+        overflow-x: scroll;
+        align-content: center;
+      }
+      
+      #sheet-table {
+        margin-bottom: 0px;
+        width: 1500px;
+        height: 350px;
+        table-layout: fixed;
+        text-align: center;
+        vertical-align: middle;
+      }
+      
+  }

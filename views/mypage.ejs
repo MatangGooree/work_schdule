@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>마이 페이지</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous" />
+    <link rel="stylesheet" href="/public/style.css" />
+  </head>
+  <body>
+    
+    <% if(my_data){ %> 
+      <%- include('nav-login.html') %> 
+    <% }else{ %> 
+      <%- include('nav.html') %> 
+      <% } %>
+<div class="container">
+
+  <h1>My page</h1>
+  <br>
+
+  <p>어서오세요 <%=my_data.worker%> 님</p>
+  <p>내 남은 휴가 : <%=my_data.vac_count%></p>
+  <p>내 남은 대근 : <%=my_data.ins_work%></p>
+  <form action="/change_pw" method="get">
+    <button class="btn btn-secondary m-0" id="change-table">비밀번호 변경</button>
+  </form>
+<br><br><br>
+  <h3>비상 연락망 </h3>
+  <p>KDNS 대표번호 : 02-781-4955		<br>		
+    양희재 : 010-6474-3888				<br>
+    남경민 : 010-2300-9405				<br>
+    박성호 : 010-7568-4649				<br>
+    은종수 : 010-3015-4974				<br>
+    김성구 : 010-8910-2912				</p>
+
+  
+ 
+</div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+      crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+
+    <script>
+    </script>
+  </body>
+</html>

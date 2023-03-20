@@ -1,0 +1,122 @@
+#form-change {
+  display: flex;
+  justify-content: flex-end;
+}
+#cal-mark{
+    width: max-content;
+    background-color: orange;
+    border-radius: 10px;
+}
+
+#today{
+    border-radius: 10px;
+    transform: scale(1.1) ;
+    background-color: rgb(222, 251, 207) !important;
+}
+
+#change-table {
+  margin: 10px 0px;
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 10px; /* 버튼과 입력 필드 사이의 간격 조절 */
+}
+#date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+#month-select {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#month-select button {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(130, 121, 109, 0.422);
+}
+
+@media (min-width: 1001px) {
+  /* 데스크탑 모드에서 적용될 스타일 */
+
+
+  #ins_button{
+    height: 42px;
+    font-size: 15px;
+}
+  table {
+    table-layout: fixed;
+  }
+
+  thead {
+    background-color: rgba(130, 121, 109, 0.422);
+    text-align: center;
+  }
+
+  td {
+    white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+    height: 7px;
+    width: 50%;
+  }
+
+  td.day0,
+  td.day6,
+  th.holiday {
+    background-color: rgba(180, 22, 22, 0.046);
+  }
+}
+@media (max-width: 1000px) {
+    
+    #ins_button{
+        font-size: 12px;
+        font-weight: 700;
+        height: 42px;
+    }
+
+#schedule_div{
+    width: 100%;
+    overflow: scroll;
+}
+#schedule{
+    table-layout: fixed;
+    width: 1100px;
+    height: 780px;
+}
+
+  #vac_div {
+    
+    width: 100%;
+    overflow: scroll;
+  }
+
+  #vac_table {
+    table-layout: fixed;
+    width: 1100px;
+    height: 780px;
+  }
+
+  thead {
+    background-color: rgba(130, 121, 109, 0.422);
+    text-align: center;
+  }
+
+  td {
+    height: 7px;
+    width: 50%;
+  }
+
+  td.day0,
+  td.day6,
+  th.holiday {
+    background-color: rgba(180, 22, 22, 0.046);
+  }
+}

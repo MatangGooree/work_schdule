@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>스케쥴 보기</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous" />
+    <link rel="stylesheet" href="/public/style-sheet.css" />
+  </head>
+  <body>
+    <% if(user){ %> <%- include('nav-login.html') %> <% }else{ %> <%- include('nav.html') %> <% } %>
+
+    <div class="container" id="date">
+      <h1 id="now_year"></h1>
+      <div id="month-select">
+        <button id="pre_btn">◀︎</button>
+        <h2 id="now_month"></h2>
+        <button id="next_btn">▶︎</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <form action="/schedule-cal" method="get" id="form-change">
+        <button class="btn btn-secondary" id="change-table">달력으로 보기</button>
+      </form>
+
+      <div id="sheet">
+        <table class="table table-bordered" id="sheet-table">
+          <thead>
+            <tr id="th-tags"></tr>
+          </thead>
+          <tbody class="cal-body" id="cal-body"></tbody>
+        </table>
+      </div>
+      <div class="m-0 p-0" id="vac_table_cont">
+        <table id="vac_table">
+          <thead>
+            <tr>
+              <th scope="col">현황</th>
+              <th scope="col">휴가</th>
+              <th scope="col">대근</th>
+            </tr>
+          </thead>
+
+          <tbody class="table-group-divider" id="count_body">
+            <tr>
+              <th><%=worker_data[0].worker%></th>
+              <td><%=worker_data[0].vac_count%></td>
+              <td><%=worker_data[0].ins_work%></td>
+            </tr>
+            <tr>
+              <th><%=worker_data[1].worker%></th>
+              <td><%=worker_data[1].vac_count%></td>
+              <td><%=worker_data[1].ins_work%></td>
+            </tr>
+            <tr>
+              <th><%=worker_data[2].worker%></th>
+              <td><%=worker_data[2].vac_count%></td>
+              <td><%=worker_data[2].ins_work%></td>
+            </tr>
+            <tr>
+              <th><%=worker_data[3].worker%></th>
+              <td><%=worker_data[3].vac_count%></td>
+              <td><%=worker_data[3].ins_work%></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+      crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+
+    <script>
+      //달력 구현
+      var now_date = new Date(); //현재시각
+      var year = now_date.getFullYear(); //현재 년
+      var month = now_date.getMonth() + 1; //현재 월 (1월이 0부터 시작)
+      var day = now_date.getDate(); //현재 일
+
+
+
+      //시트 만들기
+
+      var workers = [];
+
+      fetch('/data/workers')
+        .then((response) => response.json())
+        .then((data) => {
+          workers = JSON.parse(data);
+          make_Cal();
+        });
+
+      function make_Cal() {
+        var first_day = new Date(year, month - 1, 1).getDay(); //1일의 요일 구하기
+        var last_day = new Date(year, month, 0).getDate(); //마지막 일자 구하기
+
+        const start_day = new Date(2023, 0, 1); // 근무자 띄우기
+        var final_day = new Date(year, month - 2, new Date(year, month - 1, 0).getDate());
+        var day_count = Math.floor((final_day.getTime() - start_day.getTime()) / (24 * 60 * 60 * 1000)) + 1;
+
+        var work_schedule = ['○', '●▣', 'X', 'XX'];
+
+        $('#th-tags').html(``);
+        $('#cal-body').html('');
+        $('#th-tags').append(`<th>근무자</th>`);
+
+        var now_month=now_date.getMonth() + 1; //현재 월 (1월이 0부터 시작)
+        var now_year=now_date.getFullYear(); //현재 월 (1월이 0부터 시작)
+
+        
+        for (let i = 1; i <= last_day; i++) {
+          //요일,날짜
+          var what_day = ['일', '월', '화', '수', '목', '금', '토'];
+
+if(i==day && month==now_month && year==now_year){
+
+  $('#th-tags').append(`<th id="today" class="${what_day[(first_day + i - 1) % 7]}">${what_day[(first_day + i - 1) % 7]}<br><span id="day_num">${i}</span><br>▼</th>`);
+}else{
+  $('#th-tags').append(`<th class="${what_day[(first_day + i - 1) % 7]}"> ${what_day[(first_day + i - 1) % 7]}<br><span id="day_num">${i}</span></th>`);
+}
+
+        }
+
+        for (let k = 0; k < 4; k++) {
+          //근무자 세로로
+          $('#cal-body').append(`<tr class="tr-tag${k}"><td>${workers[k].worker}</td>`);
+
+          for (let q = 0; q < last_day; q++) {
+            //근무시간
+
+            var total_day = day_count + q + 1;
+
+            if (work_schedule[(total_day - k + 4) % 4] == '○') {
+              var day_mark = 'day';
+            } else if (work_schedule[(total_day - k + 4) % 4] == '●▣') {
+              day_mark = 'night';
+            } else {
+              day_mark = 'rest';
+            }
+
+            var day_td = new Date(year, month - 1, q + 1).getDay();
+            if (day_td == 0 || day_td == 6) {
+              $(`.tr-tag${k}`).append(`<td class="holiday" id=${year}${month}${q + 1}-${workers[k].worker}-${day_mark}>${work_schedule[(total_day - k + 4) % 4]}</td>`);
+            } else {
+              $(`.tr-tag${k}`).append(`<td id=${year}${month}${q + 1}-${workers[k].worker}-${day_mark}>${work_schedule[(total_day - k + 4) % 4]}</td>`);
+            }
+          }
+          $('#cal-body').append(`</tr>`);
+        }
+
+        document.querySelector('#now_year').innerHTML = `${year}년`;
+        document.querySelector('#now_month').innerHTML = `${month}월`;
+        mark_vacation();
+      }
+
+      //원하는 달 입력기능 추가하기
+
+      //근무자 띄우기
+
+      document.querySelector('#pre_btn').addEventListener('click', function () {
+        //이전달보기
+        if (month > 1) {
+          month--;
+          make_Cal();
+        } else if (month == 1) {
+          month = 12;
+          year--;
+          make_Cal();
+        }
+      });
+
+      document.querySelector('#next_btn').addEventListener('click', function () {
+        //다음달 보기
+        if (month < 12) {
+          month++;
+          make_Cal();
+        } else if ((month = 12)) {
+          month = 1;
+          year++;
+          make_Cal();
+        }
+      });
+
+      //휴가신청자의 데이터를 불러와서 innerHTML 수정하기
+
+      function mark_vacation() {
+        var vacation_user = [];
+
+        fetch('/data/vac_req')
+          .then((response) => response.json())
+          .then((data) => {
+            vacation_user = JSON.parse(data);
+            //해당 변수를 쓸 함수
+
+            vacation(vacation_user);
+          });
+
+        function vacation(data) {
+          for (let i = 0; i < data.length; i++) {
+            var target_vac = `${data[i].year}${data[i].month}${data[i].day}-${data[i].worker}-${data[i].time}`;
+            if (data[i].time == 'day') {
+              $(`#${target_vac}`).html(`XX`).css({ 'background-color': 'yellow', width: 'max-content' });
+            } else if (data[i].time == 'night') {
+              $(`#${target_vac}`).html(`XX`).css({ 'background-color': 'yellow', width: 'max-content' });
+            }
+
+            var target_ins = `${data[i].year}${data[i].month}${data[i].day}-${data[i].changed}-rest`;
+            if (data[i].time == 'day') {
+              $(`#${target_ins}`).html(`○`).css({ 'background-color': 'orange', width: 'max-content' });
+            } else if (data[i].time == 'night') {
+              $(`#${target_ins}`).html(`●▣`).css({ 'background-color': 'orange', width: 'max-content' });
+            }
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
