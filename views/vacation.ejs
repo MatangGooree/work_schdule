@@ -206,6 +206,7 @@
           for (let i = 0; i < data.length; i++) {
             var target = `${data[i].year}${data[i].month}${data[i].day}-${data[i].worker}-${data[i].time}`;
             var inner_html = `
+            <input type="text" name="worker" id="" value="${data[i].worker}" style="display: none;">
             <input type="text" name="changed" id="" value="${data[i].changed}" style="display: none;">
             <input type="number" name="year" id="" value="${data[i].year}" style="display: none;">
   <input type="number" name="month" id="" value="${data[i].month}" style="display: none;">
@@ -243,11 +244,12 @@
             var cancel_month = e.target.previousElementSibling.previousElementSibling.previousElementSibling.value;
             var cancel_year = e.target.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.value;
             var cancel_changed = e.target.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.value;
+            var cancel_worker = e.target.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.value;
 
             $.ajax({
               method: 'DELETE',
               url: '/delete/vacation',
-              data: { year: cancel_year, month: cancel_month, day: cancel_day, time: cancel_time, changed_worker: cancel_changed },
+              data: { year: cancel_year, month: cancel_month, day: cancel_day, time: cancel_time, changed_worker: cancel_changed,worker:cancel_worker },
             });
             location.reload(true);
           });
