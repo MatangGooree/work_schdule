@@ -325,7 +325,15 @@ app.post('/change_pw', function (req, res) {
   }
 });
 
-app.get('/vacation_admin', function (req, res) {
+function is_admin(req,res,next){
+if(req.user._authority=='admin'){
+  next()
+}else{
+  res.send("<script>alert('관리자 권한입니다.');location.href='/login';</script>");
+}
+}
+
+app.get('/vacation_admin', is_admin,function (req, res) {
   db.collection('workers').findOne({ _id: req.user._id }, function (err, data) {
     console.log(typeof req.user._id);
     console.log(typeof data._id);
