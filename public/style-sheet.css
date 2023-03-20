@@ -6,7 +6,7 @@ body {
 
 #sheet-table tr :first-child {
   width: 80px;
-  background-color: rgba(57, 47, 47, 0.294);
+  background-color: rgb(182, 175, 175);
   font-size: large;
 }
 
@@ -127,6 +127,12 @@ td.holiday {
   }
 @media (max-width: 1000px) {
     /* 모바일 모드에서 적용될 스타일 */
+
+    #cal-body tr :first-child{
+        position:sticky;
+        left: -1px;
+    }
+
 
 #today{
     
