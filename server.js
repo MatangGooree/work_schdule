@@ -166,13 +166,13 @@ app.post('/vacation_req', function (req, res) {
               return res.send("<script>alert('휴가 신청일이 아닙니다');location.href='/vacation';</script>");
             } else if (req.body.day < day && req.body.month <= month) {
               return res.send(`<script>alert('과거의 휴가 입니다');location.href='/vacation';</script>`);
-            } else if ((day == 15 && req.body.month <= month) || (day == last_day && req.body.month == month + 1 && req.body.day <= 15)) {
+            } else if (my_vac_count == 0) {
               return res.send(`<script>alert('휴가 사용이 불가능 합니다 (본인 잔여 휴가 부족)');location.href='/vacation';</script>`);
-            } else if (exist_changed !== null) {
+            } else if ((day == 15 && req.body.month <= month) || (day == last_day && req.body.month == month + 1 && req.body.day <= 15)) {
               return res.send("<script>alert('휴가 사용 가능일이 아닙니다(2주)');location.href='/vacation';</script>");
             } else if (changed_ins_count.ins_work == 0) {
               return res.send(`<script>alert('${changed_ins_count.worker}의 대근이 불가능 합니다 (잔여 대근 부족)');location.href='/vacation';</script>`);
-            } else if (my_vac_count == 0) {
+            } else if (exist_changed !== null) {
               return res.send(`<script>alert('${exist_changed.changed}의 대근이 불가능 합니다 (24시간 근무)');location.href='/vacation';</script>`);
             } else {
               db.collection('vacation').insertOne(
