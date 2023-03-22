@@ -22,7 +22,9 @@ body {
   padding: 10px 0;
   line-height: 1.5;
   vertical-align: middle;
+  
 }
+
 
 #sheet-table thead {
   background-color: rgba(24, 4, 4, 0.101);
@@ -124,6 +126,8 @@ td.holiday {
     text-align: center;
     vertical-align: middle;
   }
+  
+
   }
 @media (max-width: 1000px) {
     /* 모바일 모드에서 적용될 스타일 */
@@ -131,6 +135,7 @@ td.holiday {
     #cal-body tr :first-child{
         position:sticky;
         left: -1px;
+        
     }
 
 
