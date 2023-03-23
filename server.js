@@ -23,6 +23,7 @@ app.use(passport.session());
 const schedule = require('node-schedule');
 
 var moment = require('moment');
+const { render } = require('ejs');
 
 require('moment-timezone');
 
@@ -83,19 +84,15 @@ app.get('/schedule', function (req, res) {
 });
 
 app.get('/vacation', login_ask, function (req, res) {
+
   if (String(req.user._id) == '6411aa8dc07abd2e31d863d8') {
-    db.collection('vacation')
-      .find()
-      .toArray(function (err, data) {
-        res.render('vacation-admin.ejs', { user: req.user });
-      });
+    res.render('vacation-admin.ejs', { user: req.user });
+  } else if (String(req.user._id) == '641be3dde51413f24536fadf') {
+    res.render('vacation-5.ejs', { user: req.user });
   } else {
-    db.collection('vacation')
-      .find()
-      .toArray(function (err, data) {
-        res.render('vacation.ejs', { user: req.user });
-      });
+    res.render('vacation.ejs', { user: req.user });
   }
+
 });
 
 app.get('/mypage', function (req, res) {
@@ -111,7 +108,7 @@ app.get('/data/workers', function (req, res) {
     .toArray(function (err, data) {
       var workers = [];
 
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < data.length; i++) {
         workers.push(data[i]);
       }
       res.json(JSON.stringify(workers));
@@ -162,6 +159,11 @@ app.post('/vacation_req', function (req, res) {
                   return res.redirect('/vacation_admin');
                 }
               );
+            } else if (String(req.user._id) == String('641be3dde51413f24536fadf')) { //관리자 본인 휴가신청
+              db.collection('vacation').insertOne({ year: req.body.year, month: req.body.month, day: req.body.day, worker: req.user.worker, submit_time: time }, function (err, data) {
+                db.collection('workers').updateOne({ worker: req.user.worker }, { $inc: { vac_count: -1 } });
+                return res.redirect('/vacation-5');
+              });
             } else if (day !== last_day && day !== 15) {
               return res.send("<script>alert('휴가 신청일이 아닙니다');location.href='/vacation';</script>");
             } else if (req.body.day < day && req.body.month <= month) {
@@ -307,8 +309,6 @@ app.get('/change_pw', function (req, res) {
 });
 
 app.post('/change_pw', function (req, res) {
-  
-
   if (req.body.new_pw1 != req.body.new_pw2) {
     //패스워드가 다르면
     res.send("<script>alert('변경할 두 비밀번호 다름');location.href='/change_pw';</script>");
@@ -324,20 +324,50 @@ app.post('/change_pw', function (req, res) {
   }
 });
 
-function is_admin(req,res,next){
-if(req.user.authority=='admin'){
-  next()
-}else{
-  res.send("<script>alert('관리자 권한입니다.');location.href='/';</script>");
-}
+function is_admin(req, res, next) {
+  if (req.user.authority == 'admin') {
+    next();
+  } else {
+    res.send("<script>alert('관리자 권한입니다.');location.href='/';</script>");
+  }
 }
 
-app.get('/vacation_admin', is_admin,function (req, res) {
+app.get('/vacation_admin', is_admin, function (req, res) {
   db.collection('workers').findOne({ _id: req.user._id }, function (err, data) {
     if (String(req.user._id) == String(data._id)) {
       res.render('vacation-admin.ejs', { user: req.user });
     } else {
       res.send("<script>alert('관리자 권한입니다.');location.href='/';</script>");
     }
+  });
+});
+
+app.get('/vacation-5', function (req, res) {
+
+  if (String(req.user._id) == '641be3dde51413f24536fadf') {    
+  db.collection('vacation')
+  .find()
+  .toArray(function (err, data) {
+    res.render('vacation-5.ejs', { user: req.user });
+  });
+  } else {
+    res.send("<script>alert('관리자 권한입니다.');location.href='/';</script>");
+  }
+
+
+});
+
+app.delete('/delete/vacation-5', function (req, res) {
+  console.log(req.body.year);
+  console.log(req.body.month);
+  console.log(req.body.day);
+  console.log(req.body.worker);
+  req.body.year = parseInt(req.body.year);
+  req.body.month = parseInt(req.body.month);
+  req.body.day = parseInt(req.body.day);
+
+  db.collection('vacation').deleteOne({ year: req.body.year, month: req.body.month, day: req.body.day, worker: req.body.worker }, function (err, data) {
+    //휴가, 대근 갯수 조정
+    db.collection('workers').updateOne({ _id: req.user._id }, { $inc: { vac_count: 1 }, function() {} });
   });
 });

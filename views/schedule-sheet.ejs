@@ -116,6 +116,7 @@
         var now_year=now_date.getFullYear(); //현재 월 (1월이 0부터 시작)
 
         
+        $('#cal-body').append(`<tr id="admin"><td>양희재</td>`);
         for (let i = 1; i <= last_day; i++) {
           //요일,날짜
           var what_day = ['일', '월', '화', '수', '목', '금', '토'];
@@ -123,14 +124,26 @@
 if(i==day && month==now_month && year==now_year){
 
   $('#th-tags').append(`<th id="today" class="${what_day[(first_day + i - 1) % 7]}">${what_day[(first_day + i - 1) % 7]}<br><span id="day_num">${i}</span><br>▼</th>`);
+  
+
 }else{
   $('#th-tags').append(`<th class="${what_day[(first_day + i - 1) % 7]}"> ${what_day[(first_day + i - 1) % 7]}<br><span id="day_num">${i}</span></th>`);
 }
+
+if (what_day[(first_day + i - 1) % 7]=='일' ||what_day[(first_day + i - 1) % 7]=='토'){
+
+  $('#admin').append(`<td class="holiday" id=${year}${month}${i}-${workers[5].worker}>XX</th>`);
+}else{
+
+  $('#admin').append(`<td id=${year}${month}${i}-${workers[5].worker}>◎</th>`);
+}
+
 
         }
 
         for (let k = 0; k < 4; k++) {
           //근무자 세로로
+          
           $('#cal-body').append(`<tr class="tr-tag${k}"><td>${workers[k].worker}</td>`);
 
           for (let q = 0; q < last_day; q++) {
@@ -218,6 +231,14 @@ if(i==day && month==now_month && year==now_year){
             } else if (data[i].time == 'night') {
               $(`#${target_ins}`).html(`●▣`).css({ 'background-color': 'orange', width: 'max-content' });
             }
+            
+            if(data[i].changed==null){
+              var target_5 = `${data[i].year}${data[i].month}${data[i].day}-${data[i].worker}`;
+              $(`#${target_5}`).html(`XX`).css({ 'background-color': 'yellow', width: 'max-content' });
+              
+            }
+
+
           }
         }
       }
