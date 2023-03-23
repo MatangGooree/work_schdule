@@ -4,6 +4,10 @@ body {
   padding: 0px;
 }
 
+#th-tags{
+  height: 110px;
+}
+
 #sheet-table tr :first-child {
   width: 80px;
   background-color: rgb(182, 175, 175);
@@ -31,9 +35,8 @@ body {
   text-align: center;
 }
 
-
 #today #day_num{
-    
+  
     font-size:x-large;
     
 }
