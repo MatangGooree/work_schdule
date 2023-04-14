@@ -46,8 +46,8 @@ var month = now_date.getMonth() + 1; //현재 월 (1월이 0부터 시작)
 var day = now_date.getDate(); //현재 일
 var last_day = new Date(year, month, 0).getDate(); //마지막 일자 구하기
 
-const add_vac = schedule.scheduleJob('0 0 3 15 * *', function () {
-  //매달 15일 3시마다 휴가 갯수 1개씩 증가시키는 함수
+const add_vac = schedule.scheduleJob('0 55 23 14 * *', function () {
+  //매달 15일 3시마다 휴가 갯수 1개씩 증가
   console.log('휴가,대근 추가');
   db.collection('workers').updateMany({}, { $inc: { vac_count: 1, ins_work: 1 } }, function (err, data) {});
 });
