@@ -105,7 +105,6 @@ app.get('/data/workers', function (req, res) {
     .find()
     .toArray(function (err, data) {
       var workers = [];
-
       for (let i = 0; i < data.length; i++) {
         workers.push(data[i]);
       }
@@ -151,6 +150,7 @@ app.post('/vacation_req', function (req, res) {
             var my_vac_count = data.vac_count;
             var my_day_vac = data.day_vac;
             var my_night_vac = data.night_vac;
+            console.log(my_day_vac)
 
             if (String(req.user._id) == String(admin_id)) {
               db.collection('vacation').insertOne(
@@ -186,9 +186,9 @@ app.post('/vacation_req', function (req, res) {
               return res.send(`<script>alert('${changed_ins_count.worker}의 대근이 불가능 합니다 (잔여 대근 부족)');location.href='/vacation';</script>`);
             } else if (exist_changed !== null) {
               return res.send(`<script>alert('${exist_changed.changed}의 대근이 불가능 합니다 (24시간 근무)');location.href='/vacation';</script>`);
-            } else if (my_day_vac <= 0) {
+            } else if (my_day_vac >=6) {
               return res.send(`<script>alert('주간 휴가 사용이 불가능 합니다 (본인 주간 휴가 부족	)');location.href='/vacation';</script>`);
-            } else if (my_night_vac <= 0) {
+            } else if (my_night_vac >=6) {
               return res.send(`<script>alert('야간 휴가 사용이 불가능 합니다 (본인 야간 휴가 부족	)');location.href='/vacation';</script>`);
             } else {
               db.collection('vacation').insertOne(
