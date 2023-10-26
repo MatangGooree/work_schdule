@@ -43,6 +43,7 @@
               <th scope="col">현황</th>
               <th scope="col">휴가</th>
               <th scope="col">대근</th>
+              <th scope="col">주/야</th>
             </tr>
           </thead>
 
@@ -51,21 +52,26 @@
               <th><%=worker_data[0].worker%></th>
               <td><%=worker_data[0].vac_count%></td>
               <td><%=worker_data[0].ins_work%></td>
+              <td><%=6-worker_data[0].day_vac%> / <%=6-worker_data[0].night_vac%></td>
+              
             </tr>
             <tr>
               <th><%=worker_data[1].worker%></th>
               <td><%=worker_data[1].vac_count%></td>
               <td><%=worker_data[1].ins_work%></td>
+              <td><%=6-worker_data[1].day_vac%> / <%=6-worker_data[1].night_vac%></td>
             </tr>
             <tr>
               <th><%=worker_data[2].worker%></th>
               <td><%=worker_data[2].vac_count%></td>
               <td><%=worker_data[2].ins_work%></td>
+              <td><%=6-worker_data[2].day_vac%> / <%=6-worker_data[2].night_vac%></td>
             </tr>
             <tr>
               <th><%=worker_data[3].worker%></th>
               <td><%=worker_data[3].vac_count%></td>
               <td><%=worker_data[3].ins_work%></td>
+              <td><%=6-worker_data[3].day_vac%> / <%=6-worker_data[3].night_vac%></td>
             </tr>
           </tbody>
         </table>

@@ -46,10 +46,8 @@ var month = now_date.getMonth() + 1; //현재 월 (1월이 0부터 시작)
 var day = parseInt(now_date.getDate()); //현재 일
 var last_day = new Date(year, month, 0).getDate(); //마지막 일자 구하기
 
-
-
 const add_vac = schedule.scheduleJob('0 0 14 14 * *', function () {
-  //매달 15일 3시마다 휴가 갯수 1개씩 증가
+  //매달 15일 2시마다 휴가 갯수 1개씩 증가
   console.log('휴가,대근 추가');
   db.collection('workers').updateMany({}, { $inc: { vac_count: 1, ins_work: 1 } }, function (err, data) {});
 });
@@ -86,7 +84,6 @@ app.get('/schedule', function (req, res) {
 });
 
 app.get('/vacation', login_ask, function (req, res) {
-
   if (String(req.user._id) == '6411aa8dc07abd2e31d863d8') {
     res.render('vacation-admin.ejs', { user: req.user });
   } else if (String(req.user._id) == '641be3dde51413f24536fadf') {
@@ -94,7 +91,6 @@ app.get('/vacation', login_ask, function (req, res) {
   } else {
     res.render('vacation.ejs', { user: req.user });
   }
-
 });
 
 app.get('/mypage', function (req, res) {
@@ -117,13 +113,15 @@ app.get('/data/workers', function (req, res) {
     });
 });
 
-function pos_vac(req, res, next) {}
-
 app.post('/vacation_req', function (req, res) {
+  now_date = new Date(); //현재시각
+  year = now_date.getFullYear(); //현재 년
+  month = now_date.getMonth() + 1; //현재 월 (1월이 0부터 시작)
+  day = parseInt(now_date.getDate()); //현재 일
+  last_day = new Date(year, month, 0).getDate(); //마지막 일자 구하기
+
   console.log('휴가 신청 수신');
   var time = moment().format('YYYY-MM-DD HH:mm:ss');
-  console.log(time);
-
   var last_month_day = new Date(year, month - 1, 0).getDate(); //전달의 마지막 일자 구하기
 
   req.body.year = parseInt(req.body.year);
@@ -146,10 +144,13 @@ app.post('/vacation_req', function (req, res) {
       },
       function (err, data) {
         var exist_changed = data;
+
         db.collection('workers').findOne({ worker: req.body.changed_worker }, function (err, data) {
           var changed_ins_count = data;
           db.collection('workers').findOne({ _id: req.user._id }, function (err, data) {
             var my_vac_count = data.vac_count;
+            var my_day_vac = data.day_vac;
+            var my_night_vac = data.night_vac;
 
             if (String(req.user._id) == String(admin_id)) {
               db.collection('vacation').insertOne(
@@ -158,10 +159,17 @@ app.post('/vacation_req', function (req, res) {
                   //휴가 갯수, 대근갯수 조정
                   db.collection('workers').updateOne({ worker: req.body.worker }, { $inc: { vac_count: -1 } });
                   db.collection('workers').updateOne({ worker: req.body.changed_worker }, { $inc: { ins_work: -1 } });
+
+                  if (req.body.time == 'day') {
+                    db.collection('workers').updateOne({ worker: req.body.worker }, { $inc: { day_vac: 1 } });
+                  } else if (req.body.time == 'night') {
+                    db.collection('workers').updateOne({ worker: req.body.worker }, { $inc: { night_vac: 1 } });
+                  }
                   return res.redirect('/vacation_admin');
                 }
               );
-            } else if (String(req.user._id) == String('641be3dde51413f24536fadf')) { //관리자 본인 휴가신청
+            } else if (String(req.user._id) == String('641be3dde51413f24536fadf')) {
+              //관리자 본인 휴가신청
               db.collection('vacation').insertOne({ year: req.body.year, month: req.body.month, day: req.body.day, worker: req.user.worker, submit_time: time }, function (err, data) {
                 db.collection('workers').updateOne({ worker: req.user.worker }, { $inc: { vac_count: -1 } });
                 return res.redirect('/vacation-5');
@@ -178,13 +186,25 @@ app.post('/vacation_req', function (req, res) {
               return res.send(`<script>alert('${changed_ins_count.worker}의 대근이 불가능 합니다 (잔여 대근 부족)');location.href='/vacation';</script>`);
             } else if (exist_changed !== null) {
               return res.send(`<script>alert('${exist_changed.changed}의 대근이 불가능 합니다 (24시간 근무)');location.href='/vacation';</script>`);
+            } else if (my_day_vac <= 0) {
+              return res.send(`<script>alert('주간 휴가 사용이 불가능 합니다 (본인 주간 휴가 부족	)');location.href='/vacation';</script>`);
+            } else if (my_night_vac <= 0) {
+              return res.send(`<script>alert('야간 휴가 사용이 불가능 합니다 (본인 야간 휴가 부족	)');location.href='/vacation';</script>`);
             } else {
               db.collection('vacation').insertOne(
                 { year: req.body.year, month: req.body.month, day: req.body.day, worker: req.body.worker, time: req.body.time, changed: req.body.changed_worker, submit_time: time },
                 function (err, data) {
                   //휴가 갯수, 대근갯수 조정
+                  console.log('durlsrk');
                   db.collection('workers').updateOne({ _id: req.user._id }, { $inc: { vac_count: -1 } });
                   db.collection('workers').updateOne({ worker: req.body.changed_worker }, { $inc: { ins_work: -1 } });
+
+                  if (req.body.time == 'day') {
+                    db.collection('workers').updateOne({ _id: req.user._id }, { $inc: { day_vac: 1 } });
+                  } else if (req.body.time == 'night') {
+                    db.collection('workers').updateOne({ _id: req.user._id }, { $inc: { night_vac: 1 } });
+                  }
+
                   return res.redirect('/vacation');
                 }
               );
@@ -274,6 +294,12 @@ app.get('/logout', login_ask, function (req, res) {
 //휴가취소 기능
 
 app.delete('/delete/vacation', function (req, res) {
+  now_date = new Date(); //현재시각
+  year = now_date.getFullYear(); //현재 년
+  month = now_date.getMonth() + 1; //현재 월 (1월이 0부터 시작)
+  day = parseInt(now_date.getDate()); //현재 일
+  last_day = new Date(year, month, 0).getDate(); //마지막 일자 구하기
+
   console.log('휴가 취소 신청 수신');
   req.body.year = parseInt(req.body.year);
   req.body.month = parseInt(req.body.month);
@@ -284,9 +310,13 @@ app.delete('/delete/vacation', function (req, res) {
       //관리자면
       db.collection('vacation').deleteOne({ year: req.body.year, month: req.body.month, day: req.body.day, time: req.body.time }, function (err, data) {
         //휴가, 대근 갯수 조정
-
         db.collection('workers').updateOne({ worker: req.body.worker }, { $inc: { vac_count: 1 }, function() {} });
         db.collection('workers').updateOne({ worker: req.body.changed_worker }, { $inc: { ins_work: 1 } });
+        if (req.body.time == 'day') {
+          db.collection('workers').updateOne({ worker: req.body.worker }, { $inc: { day_vac: -1 } });
+        } else if (req.body.time == 'night') {
+          db.collection('workers').updateOne({ worker: req.body.worker }, { $inc: { night_vac: -1 } });
+        }
         return;
       });
     } else if (day !== last_day && day !== 15) {
@@ -301,6 +331,12 @@ app.delete('/delete/vacation', function (req, res) {
         //휴가, 대근 갯수 조정
         db.collection('workers').updateOne({ _id: req.user._id }, { $inc: { vac_count: 1 }, function() {} });
         db.collection('workers').updateOne({ worker: req.body.changed_worker }, { $inc: { ins_work: 1 } });
+
+        if (req.body.time == 'day') {
+          db.collection('workers').updateOne({ _id: req.user._id }, { $inc: { day_vac: -1 } });
+        } else if (req.body.time == 'night') {
+          db.collection('workers').updateOne({ _id: req.user._id }, { $inc: { night_vac: -1 } });
+        }
       });
     }
   });
@@ -345,18 +381,15 @@ app.get('/vacation_admin', is_admin, function (req, res) {
 });
 
 app.get('/vacation-5', function (req, res) {
-
-  if (String(req.user._id) == '641be3dde51413f24536fadf') {    
-  db.collection('vacation')
-  .find()
-  .toArray(function (err, data) {
-    res.render('vacation-5.ejs', { user: req.user });
-  });
+  if (String(req.user._id) == '641be3dde51413f24536fadf') {
+    db.collection('vacation')
+      .find()
+      .toArray(function (err, data) {
+        res.render('vacation-5.ejs', { user: req.user });
+      });
   } else {
     res.send("<script>alert('관리자 권한입니다.');location.href='/';</script>");
   }
-
-
 });
 
 app.delete('/delete/vacation-5', function (req, res) {
