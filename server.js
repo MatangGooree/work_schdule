@@ -186,9 +186,9 @@ app.post('/vacation_req', function (req, res) {
               return res.send(`<script>alert('${changed_ins_count.worker}의 대근이 불가능 합니다 (잔여 대근 부족)');location.href='/vacation';</script>`);
             } else if (exist_changed !== null) {
               return res.send(`<script>alert('${exist_changed.changed}의 대근이 불가능 합니다 (24시간 근무)');location.href='/vacation';</script>`);
-            } else if (my_day_vac >=6) {
+            } else if (req.body.time == 'day' && my_day_vac >=6) {
               return res.send(`<script>alert('주간 휴가 사용이 불가능 합니다 (본인 주간 휴가 부족	)');location.href='/vacation';</script>`);
-            } else if (my_night_vac >=6) {
+            } else if (req.body.time == 'night' && my_night_vac >=6) {
               return res.send(`<script>alert('야간 휴가 사용이 불가능 합니다 (본인 야간 휴가 부족	)');location.href='/vacation';</script>`);
             } else {
               db.collection('vacation').insertOne(
